@@ -17,6 +17,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     open-in-view: false
+    defer-datasource-initialization: true
 
   security:
     user:
