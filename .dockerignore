@@ -1,0 +1,9 @@
+target/
+*.log
+.git/
+.github/
+tests/
+docs/
+reports/
+.vscode/
+node_modules/
