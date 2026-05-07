@@ -11,6 +11,7 @@ import com.medicita.app.repository.DoctorRepository;
 import com.medicita.app.repository.SpecialtyRepository;
 import com.medicita.app.repository.UserRepository;
 import com.medicita.app.service.DoctorService;
+import com.medicita.app.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class DoctorServiceImpl implements DoctorService {
     private final UserRepository userRepository;
     private final SpecialtyRepository specialtyRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
     @Override
     @Transactional(readOnly = true)
@@ -53,6 +55,13 @@ public class DoctorServiceImpl implements DoctorService {
     public DoctorDTO findById(UUID id) {
         return toDTO(doctorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", id)));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DoctorDTO findCurrentDoctor() {
+        return toDTO(doctorRepository.findByUser(userService.getCurrentUser())
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor profile not found for current user")));
     }
 
     @Override

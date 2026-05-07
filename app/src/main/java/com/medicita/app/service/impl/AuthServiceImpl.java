@@ -8,7 +8,6 @@ import com.medicita.app.entity.User;
 import com.medicita.app.enums.Role;
 import com.medicita.app.repository.PatientRepository;
 import com.medicita.app.repository.UserRepository;
-import com.medicita.app.security.JwtService;
 import com.medicita.app.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,7 +21,6 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PatientRepository patientRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
 
     @Override
     @Transactional
@@ -69,7 +67,6 @@ public class AuthServiceImpl implements AuthService {
 
     private AuthResponse buildAuthResponse(User user) {
         return AuthResponse.builder()
-                .token(jwtService.generateToken(user))
                 .email(user.getEmail())
                 .role(user.getRole().name())
                 .fullName(user.getFirstName() + " " + user.getLastName())

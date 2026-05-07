@@ -10,6 +10,7 @@ public interface DoctorService {
     List<DoctorDTO> findAll();
     List<DoctorDTO> findBySpecialty(UUID specialtyId);
     DoctorDTO findById(UUID id);
+    DoctorDTO findCurrentDoctor();
     DoctorDTO create(DoctorRequest request);
     DoctorDTO update(UUID id, DoctorRequest request);
     void deactivate(UUID id);
