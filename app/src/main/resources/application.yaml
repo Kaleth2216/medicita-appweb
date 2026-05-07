@@ -35,11 +35,6 @@ server:
   error:
     include-message: always
 
-app:
-  jwt:
-    secret: medicita-secret-key-for-jwt-authentication-2026-calidad-software
-    expiration: 86400000
-
 management:
   endpoints:
     web:

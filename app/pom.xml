@@ -29,8 +29,7 @@
 	<properties>
 		<java.version>25</java.version>
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
-		<jjwt.version>0.12.6</jjwt.version>
-		<sonar.projectKey>medicita</sonar.projectKey>
+<sonar.projectKey>medicita</sonar.projectKey>
 		<sonar.projectName>MediCita</sonar.projectName>
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 	</properties>
@@ -94,25 +93,6 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-
-		<!-- JWT -->
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-api</artifactId>
-			<version>${jjwt.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-impl</artifactId>
-			<version>${jjwt.version}</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-jackson</artifactId>
-			<version>${jjwt.version}</version>
-			<scope>runtime</scope>
 		</dependency>
 
 		<!-- ModelMapper -->
