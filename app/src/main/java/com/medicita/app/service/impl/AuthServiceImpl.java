@@ -8,8 +8,10 @@ import com.medicita.app.entity.User;
 import com.medicita.app.enums.Role;
 import com.medicita.app.repository.PatientRepository;
 import com.medicita.app.repository.UserRepository;
+import com.medicita.app.security.JwtTokenProvider;
 import com.medicita.app.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PatientRepository patientRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     @Transactional
@@ -56,10 +59,10 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+            throw new BadCredentialsException("Invalid email or password");
         }
         if (!user.isActive()) {
-            throw new RuntimeException("Account is disabled");
+            throw new BadCredentialsException("Account is disabled");
         }
 
         return buildAuthResponse(user);
@@ -67,6 +70,7 @@ public class AuthServiceImpl implements AuthService {
 
     private AuthResponse buildAuthResponse(User user) {
         return AuthResponse.builder()
+                .token(jwtTokenProvider.generateToken(user))
                 .email(user.getEmail())
                 .role(user.getRole().name())
                 .fullName(user.getFirstName() + " " + user.getLastName())
