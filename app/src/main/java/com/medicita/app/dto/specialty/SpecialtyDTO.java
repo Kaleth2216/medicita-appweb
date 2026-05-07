@@ -1,0 +1,17 @@
+package com.medicita.app.dto.specialty;
+
+import lombok.*;
+
+import java.util.UUID;
+
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SpecialtyDTO {
+
+    private UUID id;
+    private String name;
+    private String description;
+    private boolean active;
+}
