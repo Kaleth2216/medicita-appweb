@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediCita – Mi Horario</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <div id="navbar"></div>
+    <main class="main-content">
+      <div class="page-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <h1>Mi Horario</h1>
+          <p id="week-label">Semana actual</p>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary" id="btn-prev">
+            <i class="bi bi-chevron-left"></i> Semana anterior
+          </button>
+          <button class="btn btn-outline-secondary" id="btn-next">
+            Semana siguiente <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="spinner-area" class="spinner-wrapper">
+        <div class="spinner-border text-primary spinner-border-sm"></div>
+        <span>Cargando horario…</span>
+      </div>
+
+      <div id="schedule-area" class="schedule-grid-wrapper d-none">
+        <table class="schedule-table" id="schedule-table">
+          <thead>
+            <tr id="schedule-header"></tr>
+          </thead>
+          <tbody id="schedule-body"></tbody>
+        </table>
+      </div>
+
+      <!-- Legend -->
+      <div class="d-flex gap-3 flex-wrap mt-3">
+        <span class="d-flex align-items-center gap-1 small">
+          <span class="appt-chip status-pending d-inline-block" style="width:16px;height:16px;"></span> Pendiente
+        </span>
+        <span class="d-flex align-items-center gap-1 small">
+          <span class="appt-chip status-confirmed d-inline-block" style="width:16px;height:16px;"></span> Confirmada
+        </span>
+        <span class="d-flex align-items-center gap-1 small">
+          <span class="appt-chip status-completed d-inline-block" style="width:16px;height:16px;"></span> Completada
+        </span>
+        <span class="d-flex align-items-center gap-1 small">
+          <span class="appt-chip status-cancelled d-inline-block" style="width:16px;height:16px;"></span> Cancelada
+        </span>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="../../js/doctor/schedule.js"></script>
+</body>
+</html>

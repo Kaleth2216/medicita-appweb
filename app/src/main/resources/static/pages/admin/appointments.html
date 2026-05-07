@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediCita – Citas (Admin)</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <div id="navbar"></div>
+    <main class="main-content">
+      <div class="page-header d-flex align-items-center justify-content-between">
+        <div>
+          <h1>Citas</h1>
+          <p>Todas las citas del sistema</p>
+        </div>
+        <div style="min-width:200px">
+          <select id="filter-status" class="form-select">
+            <option value="">Todos los estados</option>
+            <option value="PENDING">Pendiente</option>
+            <option value="CONFIRMED">Confirmada</option>
+            <option value="COMPLETED">Completada</option>
+            <option value="CANCELLED">Cancelada</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div id="table-spinner" class="spinner-wrapper">
+          <div class="spinner-border text-primary spinner-border-sm"></div>
+          <span>Cargando citas…</span>
+        </div>
+        <div id="table-wrapper" class="d-none">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Paciente</th>
+                <th>Médico</th>
+                <th>Especialidad</th>
+                <th>Fecha y hora</th>
+                <th>Motivo</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="appointments-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="../../js/admin/appointments.js"></script>
+</body>
+</html>
