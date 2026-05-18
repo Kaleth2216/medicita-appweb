@@ -73,4 +73,12 @@ public class SpecialtyServiceImpl implements SpecialtyService {
         specialty.setActive(false);
         specialtyRepository.save(specialty);
     }
+
+    @Override
+    public void activate(UUID id) {
+        Specialty specialty = specialtyRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Specialty", "id", id));
+        specialty.setActive(true);
+        specialtyRepository.save(specialty);
+    }
 }

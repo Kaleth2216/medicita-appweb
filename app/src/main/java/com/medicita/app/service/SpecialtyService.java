@@ -13,4 +13,5 @@ public interface SpecialtyService {
     SpecialtyDTO create(SpecialtyRequest request);
     SpecialtyDTO update(UUID id, SpecialtyRequest request);
     void delete(UUID id);
+    void activate(UUID id);
 }

@@ -18,7 +18,7 @@ function renderTable() {
     return;
   }
   tbody.innerHTML = specialties.map(s => `
-    <tr>
+    <tr${s.active ? '' : ' class="table-row-inactive"'}>
       <td class="fw-semibold">${s.name}</td>
       <td>${s.description || '<span class="text-muted">–</span>'}</td>
       <td>${s.active
@@ -28,9 +28,13 @@ function renderTable() {
         <button class="btn btn-sm btn-outline-primary me-1" onclick="openEdit('${s.id}')" title="Editar">
           <i class="bi bi-pencil"></i>
         </button>
-        <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('${s.id}', '${s.name}')" title="Desactivar">
-          <i class="bi bi-slash-circle"></i>
-        </button>
+        ${s.active
+          ? `<button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('${s.id}', '${s.name}')" title="Desactivar">
+               <i class="bi bi-slash-circle"></i>
+             </button>`
+          : `<button class="btn btn-sm btn-outline-success" onclick="confirmActivate('${s.id}', '${s.name}')" title="Reactivar">
+               <i class="bi bi-arrow-counterclockwise"></i>
+             </button>`}
       </td>
     </tr>`).join('');
 }
@@ -59,7 +63,7 @@ window.openEdit = function (id) {
 window.confirmDelete = async function (id, name) {
   const ok = await showConfirm({
     title: 'Desactivar especialidad',
-    message: `¿Deseas desactivar la especialidad <strong>${name}</strong>?`,
+    message: `¿Deseas desactivar la especialidad <strong>${name}</strong>? No estará disponible para nuevas citas.`,
     confirmText: 'Sí, desactivar',
     cancelText: 'Cancelar',
     variant: 'danger',
@@ -72,6 +76,25 @@ window.confirmDelete = async function (id, name) {
     await loadSpecialties();
   } catch (err) {
     showToast(err.message || 'Error al desactivar la especialidad.');
+  }
+};
+
+window.confirmActivate = async function (id, name) {
+  const ok = await showConfirm({
+    title: 'Reactivar especialidad',
+    message: `¿Deseas reactivar la especialidad <strong>${name}</strong>? Volverá a estar disponible para nuevas citas.`,
+    confirmText: 'Sí, reactivar',
+    cancelText: 'Cancelar',
+    variant: 'success',
+    icon: 'bi-arrow-counterclockwise',
+  });
+  if (!ok) return;
+  try {
+    await put(`/admin/specialties/${id}/activate`);
+    showToast('Especialidad reactivada correctamente.', 'success');
+    await loadSpecialties();
+  } catch (err) {
+    showToast(err.message || 'Error al reactivar la especialidad.');
   }
 };
 

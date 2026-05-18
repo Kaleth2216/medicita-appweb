@@ -24,7 +24,7 @@ function renderTable() {
     return;
   }
   tbody.innerHTML = doctors.map(d => `
-    <tr>
+    <tr${d.active ? '' : ' class="table-row-inactive"'}>
       <td class="fw-semibold">${d.firstName} ${d.lastName}</td>
       <td>${d.specialtyName || '–'}</td>
       <td><code>${d.medicalLicense}</code></td>
@@ -36,9 +36,13 @@ function renderTable() {
         <button class="btn btn-sm btn-outline-primary me-1" onclick="openEdit('${d.id}')" title="Editar">
           <i class="bi bi-pencil"></i>
         </button>
-        <button class="btn btn-sm btn-outline-danger" onclick="confirmDeactivate('${d.id}', '${d.firstName} ${d.lastName}')" title="Desactivar">
-          <i class="bi bi-slash-circle"></i>
-        </button>
+        ${d.active
+          ? `<button class="btn btn-sm btn-outline-danger" onclick="confirmDeactivate('${d.id}', '${d.firstName} ${d.lastName}')" title="Desactivar">
+               <i class="bi bi-slash-circle"></i>
+             </button>`
+          : `<button class="btn btn-sm btn-outline-success" onclick="confirmActivate('${d.id}', '${d.firstName} ${d.lastName}')" title="Reactivar">
+               <i class="bi bi-arrow-counterclockwise"></i>
+             </button>`}
       </td>
     </tr>`).join('');
 }
@@ -97,6 +101,25 @@ window.confirmDeactivate = async function (id, name) {
     await loadData();
   } catch (err) {
     showToast(err.message || 'Error al desactivar médico.');
+  }
+};
+
+window.confirmActivate = async function (id, name) {
+  const ok = await showConfirm({
+    title: 'Reactivar médico',
+    message: `¿Deseas reactivar al médico <strong>${name}</strong>? Podrá iniciar sesión de nuevo.`,
+    confirmText: 'Sí, reactivar',
+    cancelText: 'Cancelar',
+    variant: 'success',
+    icon: 'bi-arrow-counterclockwise',
+  });
+  if (!ok) return;
+  try {
+    await put(`/admin/doctors/${id}/activate`);
+    showToast('Médico reactivado correctamente.', 'success');
+    await loadData();
+  } catch (err) {
+    showToast(err.message || 'Error al reactivar médico.');
   }
 };
 

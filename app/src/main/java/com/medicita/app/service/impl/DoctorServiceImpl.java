@@ -120,6 +120,16 @@ public class DoctorServiceImpl implements DoctorService {
         doctorRepository.save(doctor);
     }
 
+    @Override
+    public void activate(UUID id) {
+        Doctor doctor = doctorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", id));
+        doctor.setActive(true);
+        doctor.getUser().setActive(true);
+        userRepository.save(doctor.getUser());
+        doctorRepository.save(doctor);
+    }
+
     private DoctorDTO toDTO(Doctor doctor) {
         return DoctorDTO.builder()
                 .id(doctor.getId())

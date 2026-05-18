@@ -14,4 +14,5 @@ public interface DoctorService {
     DoctorDTO create(DoctorRequest request);
     DoctorDTO update(UUID id, DoctorRequest request);
     void deactivate(UUID id);
+    void activate(UUID id);
 }

@@ -205,6 +205,13 @@ body {
 
 .table tbody tr:hover { background: #f8fafc; }
 
+.table tbody tr.table-row-inactive {
+  background: #fafafa;
+  color: #94a3b8;
+}
+.table tbody tr.table-row-inactive:hover { background: #f1f5f9; }
+.table tbody tr.table-row-inactive code { color: #94a3b8; }
+
 /* ── Content Card ────────────────────────────────────────────────────────── */
 .content-card {
   background: #fff;

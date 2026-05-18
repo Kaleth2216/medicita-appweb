@@ -64,6 +64,12 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success("Doctor deactivated", null));
     }
 
+    @PutMapping("/doctors/{id}/activate")
+    public ResponseEntity<ApiResponse<?>> activateDoctor(@PathVariable UUID id) {
+        doctorService.activate(id);
+        return ResponseEntity.ok(ApiResponse.success("Doctor activated", null));
+    }
+
     // ── Specialties ──────────────────────────────────────────────────────────
 
     @GetMapping("/specialties")
@@ -87,6 +93,12 @@ public class AdminController {
     public ResponseEntity<ApiResponse<?>> deleteSpecialty(@PathVariable UUID id) {
         specialtyService.delete(id);
         return ResponseEntity.ok(ApiResponse.success("Specialty deactivated", null));
+    }
+
+    @PutMapping("/specialties/{id}/activate")
+    public ResponseEntity<ApiResponse<?>> activateSpecialty(@PathVariable UUID id) {
+        specialtyService.activate(id);
+        return ResponseEntity.ok(ApiResponse.success("Specialty activated", null));
     }
 
     // ── Leaves ───────────────────────────────────────────────────────────────
