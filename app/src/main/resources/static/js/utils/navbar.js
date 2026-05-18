@@ -1,4 +1,5 @@
 import { getRole, getFullName, logout } from './auth.js';
+import { showConfirm } from './toast.js';
 
 const NAV = {
   ADMIN: [
@@ -55,5 +56,15 @@ export function renderNavbar(activePage) {
       </div>
     </nav>`;
 
-  document.getElementById('btn-logout').addEventListener('click', logout);
+  document.getElementById('btn-logout').addEventListener('click', async () => {
+    const ok = await showConfirm({
+      title: 'Cerrar sesión',
+      message: '¿Deseas cerrar tu sesión actual?',
+      confirmText: 'Sí, cerrar',
+      cancelText: 'Cancelar',
+      variant: 'primary',
+      icon: 'bi-box-arrow-right',
+    });
+    if (ok) logout();
+  });
 }

@@ -1,13 +1,14 @@
 :root {
-  --primary: #0d6efd;
-  --success: #198754;
-  --warning: #ffc107;
-  --danger: #dc3545;
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
   --sidebar-width: 250px;
-  --sidebar-bg: #1e293b;
+  --sidebar-bg: #1e1b4b;
   --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-muted: #94a3b8;
-  --body-bg: #f1f5f9;
+  --sidebar-muted: #a5b4fc;
+  --body-bg: #f8f7ff;
 }
 
 * { box-sizing: border-box; }
@@ -168,7 +169,7 @@ body {
 }
 
 /* ── Status Badges ───────────────────────────────────────────────────────── */
-.badge.status-pending   { background-color: var(--warning) !important; color: #000 !important; }
+.badge.status-pending   { background-color: var(--warning) !important; color: #fff !important; }
 .badge.status-confirmed { background-color: var(--primary) !important; }
 .badge.status-completed { background-color: var(--success) !important; }
 .badge.status-cancelled { background-color: var(--danger)  !important; }
@@ -271,22 +272,52 @@ body {
   min-width: 110px;
   height: 56px;
   vertical-align: top;
+  transition: background 0.15s;
 }
 
+.schedule-table td.cell-available {
+  background: #f0fdf4;
+}
+
+.schedule-table td.cell-available:hover {
+  background: #dcfce7;
+}
+
+.schedule-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.legend-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.legend-dot.available  { background: #bbf7d0; border: 1px solid #86efac; }
+.legend-dot.pending    { background: #fef3c7; border-left: 3px solid var(--warning); }
+.legend-dot.confirmed  { background: #ede9fe; border-left: 3px solid var(--primary); }
+.legend-dot.completed  { background: #d1fae5; border-left: 3px solid var(--success); }
+.legend-dot.cancelled  { background: #fee2e2; border-left: 3px solid var(--danger); }
+
 .appt-chip {
-  border-radius: 0.25rem;
-  padding: 0.2rem 0.4rem;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.5rem;
   font-size: 0.72rem;
   margin-bottom: 0.2rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   border-left: 3px solid transparent;
+  cursor: default;
 }
 
-.appt-chip.status-pending   { background: #fef9c3; border-left-color: var(--warning); color: #713f12; }
-.appt-chip.status-confirmed { background: #dbeafe; border-left-color: var(--primary); color: #1e40af; }
-.appt-chip.status-completed { background: #dcfce7; border-left-color: var(--success); color: #14532d; }
+.appt-chip.status-pending   { background: #fef3c7; border-left-color: var(--warning); color: #92400e; }
+.appt-chip.status-confirmed { background: #ede9fe; border-left-color: var(--primary); color: #3730a3; }
+.appt-chip.status-completed { background: #d1fae5; border-left-color: var(--success); color: #065f46; }
 .appt-chip.status-cancelled { background: #fee2e2; border-left-color: var(--danger);  color: #7f1d1d; }
 
 /* ── Multi-step wizard ───────────────────────────────────────────────────── */
@@ -329,17 +360,73 @@ body {
 }
 
 /* ── Auth pages ──────────────────────────────────────────────────────────── */
+.auth-bg {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #a78bfa 100%);
+  position: relative;
+}
+
+.auth-back-btn {
+  position: fixed;
+  top: 1.25rem;
+  left: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  z-index: 10;
+}
+
+.auth-back-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
 .auth-card {
   width: 100%;
   max-width: 460px;
-  border-radius: 1rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-radius: 1.25rem;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
   border: none;
 }
 
-.auth-logo {
-  font-size: 2rem;
-  color: var(--primary);
+.auth-logo-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, var(--primary), #7c3aed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  color: #fff;
+  margin: 0 auto;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+}
+
+.auth-logo { font-size: 2rem; color: var(--primary); }
+
+/* Fix input-group border overlap */
+.input-group .form-control:focus { z-index: 3; }
+.input-group-text { background: #f8f9fa; }
+
+/* ── Confirm Dialog ──────────────────────────────────────────────────────── */
+.confirm-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */

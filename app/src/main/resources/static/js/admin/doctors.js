@@ -1,6 +1,7 @@
 import { get, post, put, del } from '../utils/api.js';
 import { requireAuth } from '../utils/auth.js';
 import { renderNavbar } from '../utils/navbar.js';
+import { showToast, showConfirm } from '../utils/toast.js';
 
 requireAuth('ADMIN');
 
@@ -9,14 +10,7 @@ let specialties = [];
 let editingId  = null;
 
 const modal      = () => bootstrap.Modal.getOrCreateInstance(document.getElementById('doctorModal'));
-const alertBox   = document.getElementById('alert-box');
-const alertMsg   = document.getElementById('alert-msg');
 const modalAlert = document.getElementById('modal-alert');
-
-function showAlert(msg, type = 'danger') {
-  alertBox.className = `alert alert-${type} alert-dismissible fade show mb-3`;
-  alertMsg.textContent = msg;
-}
 
 function showModalError(msg) {
   modalAlert.className = 'alert alert-danger mt-3';
@@ -39,10 +33,10 @@ function renderTable() {
         ? '<span class="badge bg-success">Activo</span>'
         : '<span class="badge bg-secondary">Inactivo</span>'}</td>
       <td>
-        <button class="btn btn-sm btn-outline-primary me-1" onclick="openEdit('${d.id}')">
+        <button class="btn btn-sm btn-outline-primary me-1" onclick="openEdit('${d.id}')" title="Editar">
           <i class="bi bi-pencil"></i>
         </button>
-        <button class="btn btn-sm btn-outline-danger" onclick="confirmDeactivate('${d.id}', '${d.firstName} ${d.lastName}')">
+        <button class="btn btn-sm btn-outline-danger" onclick="confirmDeactivate('${d.id}', '${d.firstName} ${d.lastName}')" title="Desactivar">
           <i class="bi bi-slash-circle"></i>
         </button>
       </td>
@@ -87,19 +81,24 @@ window.openEdit = function (id) {
   modal().show();
 };
 
-window.confirmDeactivate = function (id, name) {
-  if (confirm(`¿Desactivar al médico ${name}?`)) deactivateDoctor(id);
-};
-
-async function deactivateDoctor(id) {
+window.confirmDeactivate = async function (id, name) {
+  const ok = await showConfirm({
+    title: 'Desactivar médico',
+    message: `¿Deseas desactivar al médico <strong>${name}</strong>? Ya no podrá iniciar sesión.`,
+    confirmText: 'Sí, desactivar',
+    cancelText: 'Cancelar',
+    variant: 'danger',
+    icon: 'bi-slash-circle-fill',
+  });
+  if (!ok) return;
   try {
     await del(`/admin/doctors/${id}`);
-    showAlert('Médico desactivado correctamente.', 'success');
+    showToast('Médico desactivado correctamente.', 'success');
     await loadData();
   } catch (err) {
-    showAlert(err.message || 'Error al desactivar médico.');
+    showToast(err.message || 'Error al desactivar médico.');
   }
-}
+};
 
 document.addEventListener('DOMContentLoaded', async () => {
   renderNavbar('doctors');
@@ -132,16 +131,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     btn.disabled = true;
-    btn.textContent = 'Cargando...';
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Guardando...';
     modalAlert.className = 'alert alert-danger mt-3 d-none';
 
     try {
       if (editingId) {
         await put(`/admin/doctors/${editingId}`, payload);
-        showAlert('Médico actualizado correctamente.', 'success');
+        showToast('Médico actualizado correctamente.', 'success');
       } else {
         await post('/admin/doctors', payload);
-        showAlert('Médico creado correctamente.', 'success');
+        showToast('Médico creado correctamente.', 'success');
       }
       modal().hide();
       await loadData();
@@ -149,7 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       showModalError(err.message || 'Error al guardar.');
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Guardar';
+      btn.innerHTML = '<i class="bi bi-floppy me-1"></i>Guardar';
     }
   });
 });

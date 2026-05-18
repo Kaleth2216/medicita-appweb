@@ -1,18 +1,11 @@
 import { get, put } from '../utils/api.js';
 import { requireAuth } from '../utils/auth.js';
 import { renderNavbar } from '../utils/navbar.js';
+import { showToast, showConfirm } from '../utils/toast.js';
 
 requireAuth('DOCTOR');
 
 let appointments = [];
-
-const alertBox = document.getElementById('alert-box');
-const alertMsg = document.getElementById('alert-msg');
-
-function showAlert(msg, type = 'danger') {
-  alertBox.className = `alert alert-${type} alert-dismissible fade show mb-3`;
-  alertMsg.textContent = msg;
-}
 
 function parseDateTime(dt) {
   if (Array.isArray(dt)) { const [y, mo, d, h = 0, mi = 0] = dt; return new Date(y, mo - 1, d, h, mi); }
@@ -50,11 +43,11 @@ function renderTable() {
         <td>${statusBadge(a.status)}</td>
         <td>
           ${canComplete(a.status) ? `
-            <button class="btn btn-sm btn-success me-1" onclick="openComplete('${a.id}')">
+            <button class="btn btn-sm btn-success me-1" onclick="openComplete('${a.id}')" title="Completar">
               <i class="bi bi-check-lg"></i>
             </button>` : ''}
           ${canCancel(a.status) ? `
-            <button class="btn btn-sm btn-outline-danger" onclick="confirmCancel('${a.id}')">
+            <button class="btn btn-sm btn-outline-danger" onclick="confirmCancel('${a.id}')" title="Cancelar">
               <i class="bi bi-x-lg"></i>
             </button>` : ''}
         </td>
@@ -77,13 +70,20 @@ window.openComplete = function (id) {
 };
 
 window.confirmCancel = async function (id) {
-  if (!confirm('¿Cancelar esta cita?')) return;
+  const ok = await showConfirm({
+    title: 'Cancelar cita',
+    message: '¿Seguro que deseas cancelar esta cita? El paciente será notificado.',
+    confirmText: 'Sí, cancelar',
+    cancelText: 'Volver',
+    variant: 'danger',
+  });
+  if (!ok) return;
   try {
     await put(`/doctor/appointments/${id}/cancel`);
-    showAlert('Cita cancelada.', 'warning');
+    showToast('Cita cancelada correctamente.', 'warning');
     await loadAppointments();
   } catch (err) {
-    showAlert(err.message || 'Error al cancelar.');
+    showToast(err.message || 'Error al cancelar la cita.');
   }
 };
 
@@ -97,15 +97,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btn   = document.getElementById('btn-confirm-complete');
 
     btn.disabled = true;
-    btn.textContent = 'Cargando...';
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Cargando...';
 
     try {
       await put(`/doctor/appointments/${id}/complete`, notes ? { notes } : {});
       bootstrap.Modal.getOrCreateInstance(document.getElementById('completeModal')).hide();
-      showAlert('Cita marcada como completada.', 'success');
+      showToast('Cita marcada como completada.', 'success');
       await loadAppointments();
     } catch (err) {
-      showAlert(err.message || 'Error al completar la cita.');
+      showToast(err.message || 'Error al completar la cita.');
     } finally {
       btn.disabled = false;
       btn.innerHTML = '<i class="bi bi-check-lg"></i> Marcar completada';

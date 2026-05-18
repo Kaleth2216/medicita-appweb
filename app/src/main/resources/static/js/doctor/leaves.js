@@ -1,19 +1,13 @@
 import { get, post } from '../utils/api.js';
 import { requireAuth } from '../utils/auth.js';
 import { renderNavbar } from '../utils/navbar.js';
+import { showToast } from '../utils/toast.js';
 
 requireAuth('DOCTOR');
 
 let leaves = [];
 
-const alertBox   = document.getElementById('alert-box');
-const alertMsg   = document.getElementById('alert-msg');
 const modalAlert = document.getElementById('modal-alert');
-
-function showAlert(msg, type = 'danger') {
-  alertBox.className = `alert alert-${type} alert-dismissible fade show mb-3`;
-  alertMsg.textContent = msg;
-}
 
 const LEAVE_LABELS  = { SICK_LEAVE: 'Incapacidad', VACATION: 'Vacaciones', PERSONAL: 'Personal' };
 const STATUS_BADGE  = { PENDING: 'status-pending', APPROVED: 'status-confirmed', REJECTED: 'status-cancelled' };
@@ -56,7 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderNavbar('leaves');
   await loadLeaves();
 
-  // Set minimum date for startDate to today
   const today = new Date().toISOString().slice(0, 10);
   document.getElementById('l-startDate').min = today;
   document.getElementById('l-endDate').min   = today;
@@ -86,13 +79,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     btn.disabled = true;
-    btn.textContent = 'Cargando...';
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Enviando...';
     modalAlert.className = 'alert alert-danger d-none';
 
     try {
       await post('/doctor/leaves', { type, startDate, endDate, reason });
       bootstrap.Modal.getOrCreateInstance(document.getElementById('leaveModal')).hide();
-      showAlert('Solicitud enviada. Espera la aprobación del administrador.', 'success');
+      showToast('Solicitud enviada. Espera la aprobación del administrador.', 'success');
       document.getElementById('leave-form').reset();
       await loadLeaves();
     } catch (err) {
@@ -100,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       modalAlert.textContent = err.message || 'Error al enviar solicitud.';
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Enviar solicitud';
+      btn.innerHTML = '<i class="bi bi-send me-1"></i>Enviar solicitud';
     }
   });
 });

@@ -81,7 +81,8 @@ function buildGrid(appointments) {
       <td class="hour-col">${String(h).padStart(2, '0')}:00</td>
       ${weekDays.map((_, di) => {
         const appts = grid[di]?.[h] || [];
-        return `<td>${appts.map(a => {
+        const cellClass = appts.length === 0 ? 'cell-available' : '';
+        return `<td class="${cellClass}">${appts.map(a => {
           const dt = parseDateTime(a.appointmentDateTime);
           const time = dt.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
           const cls = a.status.toLowerCase();

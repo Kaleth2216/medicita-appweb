@@ -1,18 +1,11 @@
 import { get, put } from '../utils/api.js';
 import { requireAuth } from '../utils/auth.js';
 import { renderNavbar } from '../utils/navbar.js';
+import { showToast, showConfirm } from '../utils/toast.js';
 
 requireAuth('ADMIN');
 
 let leaves = [];
-
-const alertBox = document.getElementById('alert-box');
-const alertMsg = document.getElementById('alert-msg');
-
-function showAlert(msg, type = 'danger') {
-  alertBox.className = `alert alert-${type} alert-dismissible fade show mb-3`;
-  alertMsg.textContent = msg;
-}
 
 const LEAVE_LABELS = { SICK_LEAVE: 'Incapacidad', VACATION: 'Vacaciones', PERSONAL: 'Personal' };
 const STATUS_MAP   = { PENDING: 'status-pending', APPROVED: 'status-confirmed', REJECTED: 'status-cancelled' };
@@ -42,11 +35,11 @@ function renderTable() {
       <td><span class="badge ${STATUS_MAP[l.status] || 'bg-secondary'}">${l.status}</span></td>
       <td>
         ${l.status === 'PENDING' ? `
-          <button class="btn btn-sm btn-success me-1" onclick="approveLeave('${l.id}')">
-            <i class="bi bi-check-lg"></i> Aprobar
+          <button class="btn btn-sm btn-success me-1" onclick="approveLeave('${l.id}')" title="Aprobar">
+            <i class="bi bi-check-lg"></i>
           </button>
-          <button class="btn btn-sm btn-danger" onclick="rejectLeave('${l.id}')">
-            <i class="bi bi-x-lg"></i> Rechazar
+          <button class="btn btn-sm btn-danger" onclick="rejectLeave('${l.id}')" title="Rechazar">
+            <i class="bi bi-x-lg"></i>
           </button>` : '<span class="text-muted small">–</span>'}
       </td>
     </tr>`).join('');
@@ -62,24 +55,40 @@ async function loadLeaves() {
 }
 
 window.approveLeave = async function (id) {
-  if (!confirm('¿Aprobar este permiso?')) return;
+  const ok = await showConfirm({
+    title: 'Aprobar permiso',
+    message: '¿Deseas aprobar esta solicitud de permiso? El médico será notificado.',
+    confirmText: 'Sí, aprobar',
+    cancelText: 'Cancelar',
+    variant: 'success',
+    icon: 'bi-check-circle-fill',
+  });
+  if (!ok) return;
   try {
     await put(`/admin/leaves/${id}/approve`);
-    showAlert('Permiso aprobado.', 'success');
+    showToast('Permiso aprobado correctamente.', 'success');
     await loadLeaves();
   } catch (err) {
-    showAlert(err.message || 'Error al aprobar.');
+    showToast(err.message || 'Error al aprobar el permiso.');
   }
 };
 
 window.rejectLeave = async function (id) {
-  if (!confirm('¿Rechazar este permiso?')) return;
+  const ok = await showConfirm({
+    title: 'Rechazar permiso',
+    message: '¿Deseas rechazar esta solicitud de permiso?',
+    confirmText: 'Sí, rechazar',
+    cancelText: 'Cancelar',
+    variant: 'danger',
+    icon: 'bi-x-circle-fill',
+  });
+  if (!ok) return;
   try {
     await put(`/admin/leaves/${id}/reject`);
-    showAlert('Permiso rechazado.', 'warning');
+    showToast('Permiso rechazado.', 'warning');
     await loadLeaves();
   } catch (err) {
-    showAlert(err.message || 'Error al rechazar.');
+    showToast(err.message || 'Error al rechazar el permiso.');
   }
 };
 

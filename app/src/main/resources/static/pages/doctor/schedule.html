@@ -19,10 +19,10 @@
         </div>
         <div class="d-flex gap-2">
           <button class="btn btn-outline-secondary" id="btn-prev">
-            <i class="bi bi-chevron-left"></i> Semana anterior
+            <i class="bi bi-chevron-left me-1"></i>Anterior
           </button>
           <button class="btn btn-outline-secondary" id="btn-next">
-            Semana siguiente <i class="bi bi-chevron-right"></i>
+            Siguiente<i class="bi bi-chevron-right ms-1"></i>
           </button>
         </div>
       </div>
@@ -42,18 +42,21 @@
       </div>
 
       <!-- Legend -->
-      <div class="d-flex gap-3 flex-wrap mt-3">
-        <span class="d-flex align-items-center gap-1 small">
-          <span class="appt-chip status-pending d-inline-block" style="width:16px;height:16px;"></span> Pendiente
+      <div class="d-flex gap-3 flex-wrap mt-3 ps-1">
+        <span class="schedule-legend">
+          <span class="legend-dot available"></span> Disponible
         </span>
-        <span class="d-flex align-items-center gap-1 small">
-          <span class="appt-chip status-confirmed d-inline-block" style="width:16px;height:16px;"></span> Confirmada
+        <span class="schedule-legend">
+          <span class="legend-dot pending"></span> Pendiente
         </span>
-        <span class="d-flex align-items-center gap-1 small">
-          <span class="appt-chip status-completed d-inline-block" style="width:16px;height:16px;"></span> Completada
+        <span class="schedule-legend">
+          <span class="legend-dot confirmed"></span> Confirmada
         </span>
-        <span class="d-flex align-items-center gap-1 small">
-          <span class="appt-chip status-cancelled d-inline-block" style="width:16px;height:16px;"></span> Cancelada
+        <span class="schedule-legend">
+          <span class="legend-dot completed"></span> Completada
+        </span>
+        <span class="schedule-legend">
+          <span class="legend-dot cancelled"></span> Cancelada
         </span>
       </div>
     </main>

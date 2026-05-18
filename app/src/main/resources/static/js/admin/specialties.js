@@ -1,6 +1,7 @@
 import { get, post, put, del } from '../utils/api.js';
 import { requireAuth } from '../utils/auth.js';
 import { renderNavbar } from '../utils/navbar.js';
+import { showToast, showConfirm } from '../utils/toast.js';
 
 requireAuth('ADMIN');
 
@@ -8,14 +9,7 @@ let specialties = [];
 let editingId   = null;
 
 const modal      = () => bootstrap.Modal.getOrCreateInstance(document.getElementById('specialtyModal'));
-const alertBox   = document.getElementById('alert-box');
-const alertMsg   = document.getElementById('alert-msg');
 const modalAlert = document.getElementById('modal-alert');
-
-function showAlert(msg, type = 'danger') {
-  alertBox.className = `alert alert-${type} alert-dismissible fade show mb-3`;
-  alertMsg.textContent = msg;
-}
 
 function renderTable() {
   const tbody = document.getElementById('specialties-tbody');
@@ -31,10 +25,10 @@ function renderTable() {
         ? '<span class="badge bg-success">Activa</span>'
         : '<span class="badge bg-secondary">Inactiva</span>'}</td>
       <td>
-        <button class="btn btn-sm btn-outline-primary me-1" onclick="openEdit('${s.id}')">
+        <button class="btn btn-sm btn-outline-primary me-1" onclick="openEdit('${s.id}')" title="Editar">
           <i class="bi bi-pencil"></i>
         </button>
-        <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('${s.id}', '${s.name}')">
+        <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('${s.id}', '${s.name}')" title="Desactivar">
           <i class="bi bi-slash-circle"></i>
         </button>
       </td>
@@ -62,19 +56,24 @@ window.openEdit = function (id) {
   modal().show();
 };
 
-window.confirmDelete = function (id, name) {
-  if (confirm(`¿Desactivar la especialidad "${name}"?`)) deleteSpecialty(id);
-};
-
-async function deleteSpecialty(id) {
+window.confirmDelete = async function (id, name) {
+  const ok = await showConfirm({
+    title: 'Desactivar especialidad',
+    message: `¿Deseas desactivar la especialidad <strong>${name}</strong>?`,
+    confirmText: 'Sí, desactivar',
+    cancelText: 'Cancelar',
+    variant: 'danger',
+    icon: 'bi-slash-circle-fill',
+  });
+  if (!ok) return;
   try {
     await del(`/admin/specialties/${id}`);
-    showAlert('Especialidad desactivada.', 'success');
+    showToast('Especialidad desactivada correctamente.', 'success');
     await loadSpecialties();
   } catch (err) {
-    showAlert(err.message || 'Error al desactivar.');
+    showToast(err.message || 'Error al desactivar la especialidad.');
   }
-}
+};
 
 document.addEventListener('DOMContentLoaded', async () => {
   renderNavbar('specialties');
@@ -91,21 +90,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     e.preventDefault();
     const btn = document.getElementById('btn-save');
     const name = document.getElementById('s-name').value.trim();
-    if (!name) { modalAlert.className = 'alert alert-danger'; modalAlert.textContent = 'El nombre es requerido.'; return; }
+    if (!name) {
+      modalAlert.className = 'alert alert-danger';
+      modalAlert.textContent = 'El nombre es requerido.';
+      return;
+    }
 
     const payload = { name, description: document.getElementById('s-description').value.trim() };
 
     btn.disabled = true;
-    btn.textContent = 'Cargando...';
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Guardando...';
     modalAlert.className = 'alert alert-danger d-none';
 
     try {
       if (editingId) {
         await put(`/admin/specialties/${editingId}`, payload);
-        showAlert('Especialidad actualizada.', 'success');
+        showToast('Especialidad actualizada.', 'success');
       } else {
         await post('/admin/specialties', payload);
-        showAlert('Especialidad creada.', 'success');
+        showToast('Especialidad creada.', 'success');
       }
       modal().hide();
       await loadSpecialties();
@@ -114,7 +117,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       modalAlert.textContent = err.message || 'Error al guardar.';
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Guardar';
+      btn.innerHTML = '<i class="bi bi-floppy me-1"></i>Guardar';
     }
   });
 });

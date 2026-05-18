@@ -1,16 +1,9 @@
 import { get, post, put } from '../utils/api.js';
 import { requireAuth } from '../utils/auth.js';
 import { renderNavbar } from '../utils/navbar.js';
+import { showToast, showConfirm } from '../utils/toast.js';
 
 requireAuth('PATIENT');
-
-const alertBox = document.getElementById('alert-box');
-const alertMsg = document.getElementById('alert-msg');
-
-function showAlert(msg, type = 'danger') {
-  alertBox.className = `alert alert-${type} alert-dismissible fade show mb-3`;
-  alertMsg.textContent = msg;
-}
 
 function parseDateTime(dt) {
   if (Array.isArray(dt)) { const [y, mo, d, h = 0, mi = 0] = dt; return new Date(y, mo - 1, d, h, mi); }
@@ -69,20 +62,27 @@ async function loadAppointments(page = 0) {
       <td>${statusBadge(a.status)}</td>
       <td>
         <button class="btn btn-sm btn-outline-danger" onclick="cancelAppt('${a.id}')">
-          <i class="bi bi-x-lg"></i> Cancelar
+          <i class="bi bi-x-lg"></i>
         </button>
       </td>
     </tr>`).join('');
 }
 
 window.cancelAppt = async function (id) {
-  if (!confirm('¿Cancelar esta cita?')) return;
+  const ok = await showConfirm({
+    title: 'Cancelar cita',
+    message: '¿Seguro que deseas cancelar esta cita? Esta acción no se puede deshacer.',
+    confirmText: 'Sí, cancelar',
+    cancelText: 'No, mantener',
+    variant: 'danger',
+  });
+  if (!ok) return;
   try {
     await put(`/patient/appointments/${id}/cancel`);
-    showAlert('Cita cancelada correctamente.', 'warning');
+    showToast('Cita cancelada correctamente.', 'warning');
     await loadAppointments(currentPage);
   } catch (err) {
-    showAlert(err.message || 'Error al cancelar.');
+    showToast(err.message || 'Error al cancelar la cita.');
   }
 };
 
@@ -130,12 +130,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('btn-prev-page').addEventListener('click', () => loadAppointments(currentPage - 1));
   document.getElementById('btn-next-page').addEventListener('click', () => loadAppointments(currentPage + 1));
 
-  // Set minimum datetime to now
   const now = new Date();
   now.setMinutes(now.getMinutes() + 30);
   document.getElementById('appt-datetime').min = now.toISOString().slice(0, 16);
 
-  // Step 1
   document.getElementById('sel-specialty').addEventListener('change', (e) => {
     document.getElementById('btn-step1-next').disabled = !e.target.value;
   });
@@ -146,7 +144,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadDoctors(selectedSpecialtyId);
   });
 
-  // Step 2
   document.getElementById('sel-doctor').addEventListener('change', (e) => {
     document.getElementById('btn-step2-next').disabled = !e.target.value;
   });
@@ -158,27 +155,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     setStep(3);
   });
 
-  // Step 3
   document.getElementById('btn-step3-back').addEventListener('click', () => setStep(2));
 
   document.getElementById('btn-book').addEventListener('click', async () => {
     const datetimeVal = document.getElementById('appt-datetime').value;
     const reason      = document.getElementById('appt-reason').value.trim();
-    const errorEl     = document.getElementById('book-error');
     const btn         = document.getElementById('btn-book');
 
     if (!datetimeVal || !reason) {
-      errorEl.className = 'alert alert-danger mb-3';
-      errorEl.textContent = 'Completa la fecha/hora y el motivo.';
+      showToast('Completa la fecha/hora y el motivo.', 'warning');
       return;
     }
 
-    errorEl.className = 'alert alert-danger d-none mb-3';
     btn.disabled = true;
-    btn.textContent = 'Cargando...';
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Agendando...';
 
     try {
-      // Ensure seconds are included for LocalDateTime parsing
       const appointmentDateTime = datetimeVal.length === 16 ? datetimeVal + ':00' : datetimeVal;
 
       await post('/patient/appointments', {
@@ -187,7 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         reason,
       });
 
-      showAlert('¡Cita agendada exitosamente!', 'success');
+      showToast('¡Cita agendada exitosamente!', 'success');
       setStep(1);
       document.getElementById('sel-specialty').value = '';
       document.getElementById('appt-datetime').value = '';
@@ -195,11 +187,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('btn-step1-next').disabled = true;
       await loadAppointments(0);
     } catch (err) {
-      errorEl.className = 'alert alert-danger mb-3';
-      errorEl.textContent = err.message || 'Error al agendar la cita.';
+      showToast(err.message || 'Error al agendar la cita.', 'danger');
     } finally {
       btn.disabled = false;
-      btn.innerHTML = '<i class="bi bi-calendar-check"></i> Agendar cita';
+      btn.innerHTML = '<i class="bi bi-calendar-check me-1"></i>Agendar cita';
     }
   });
 });
